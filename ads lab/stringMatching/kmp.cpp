@@ -1,46 +1,50 @@
 #include <bits/stdc++.h>
 using namespace std;
-void compute(vector<int>&lps,string pattern,int m){
-    int i=0,j=1;
-    int count=0;        
+void findLps(vector<int>&lps,string &text,int m){
+    int i=0;
+    int j=1;
+    
     while(j<m){
-        if(pattern[j]==pattern[i]){
+        int count=0;
+        if(text[i]==text[j]){
             count++;
             lps[j]=count;
             i++;
             j++;
         }else{
-            count=0;
-            i=0;
-            j++;
-        }
-    }
-}
-int kmp(string text,string pattern,vector<int>&lps,int n,int m){
-    int i=0,j=-1;
-    while(i<n){
-        if(j==m-1) return i-m;
-        if(text[i]==pattern[j+1]){
-            i++;
-            j++;
-        }else{
-            if(j==-1){
-                i++;
+            if(i==0){
+                j++;
             }else{
-                j=lps[j]-1;
+                i=lps[i-1];
             }
         }
     }
-    return -1;
 }
 int main(){
-    string text="aabaabbcaabaab";
-    string pattern="aabaa";
-    int n=text.size();
-    int m=pattern.size();
+    string text="danduaaakhilreddy";
+    string pattern="akhil";
+    int m=text.size();
+    int n=pattern.size();
     vector<int>lps(m,0);
-    compute(lps,pattern,m);
-    cout<<kmp(text,pattern,lps,n,m);
+    findLps(lps,pattern,n);
+    int i=0,j=0;
+    int result=-1;
+    while(i<m){
+        if(j==n){
+            result=i-n;
+            break;
+        }
+        if(text[i]==pattern[j]){
+            i++;
+            j++;
+        }else{
+            if(j==0) i++;
+            else{
+                j=lps[j-1];
+            }
+        }
+    }
+    cout<<"pattern found at index :"<<result;
     
     return 0;
 }
