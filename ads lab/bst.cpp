@@ -7,64 +7,56 @@ class Node{
         Node* right;
         Node(int data){
             this->data=data;
-            left=NULL;
-            right=NULL;
+            left=right=NULL;
+        }
+        Node(){
+            left=right=NULL;
         }
 };
-
-Node* insert(Node* root,int key){
-    
-    if(root==NULL) return new Node(key);
-    if(key>root->data){
-        root->right=insert(root->right,key);
-    }else if(root->data>key){
-        root->left=insert(root->left,key);
+Node* insert(int val,Node* root){
+    if(root==NULL) return new Node(val);
+    Node* temp=new Node(val);
+    Node* curr=root;
+    Node* prev=root;
+    while(curr!=NULL){
+        if(curr->data<val){
+            prev=curr;
+            curr=curr->right;
+        }else{
+            prev=curr;
+            curr=curr->left;
+        }
+    }
+    if(prev->data<val){
+     prev->right=temp;   
     }else{
-        return root;
+        prev->left=temp;
     }
     return root;
 }
-bool find(Node* root,int key){
-    if(root==NULL) return false;
-    if(root->data==key) return true;
-    else if(root->data>key){
-        return find(root->left,key);
-    }else{
-        return find(root->right,key);
+bool search(Node* root,int key){
+    Node* temp=root;
+    while(temp){
+        if(temp->data==key) return true;
+        else if(temp->data<key){
+            temp=temp->right;
+        }else{
+            temp=temp->left;
+        }
     }
     return false;
 }
-Node* helper(Node* root){//takes node to be deleted then it go left max element and delete node
-
+Node* helper(Node* root){
+    if(root==NULL) return NULL;
     if(root->left==NULL) return root->right;
-    Node* curr=root->left;
-    while(curr->right!=NULL){
-        curr=curr->right;
+    if(root->right==NULL) return root->left;
+    Node* temp=root->left;
+    while(temp->right!=NULL){
+        temp=temp->right;
     }
-    curr->right=root->right;
-    Node* newRoot=root->left;
-    root->left=NULL;
+    temp->right=root->right;
     root->right=NULL;
-    delete root;
-    return newRoot;
-}
-Node* deleteNode(Node* root,int key){
-    
-    if(root->data==key) return helper(root);
-    if(root->data>key){
-        if(root->left!=NULL&&root->left->data==key){
-            root->left=helper(root->left);
-        }else{
-            root->left=deleteNode(root->left,key);
-        }
-    }else{//root->data <key
-        if(root->right!=NULL&&root->right->data==key){
-            root->right=helper(root->right);
-        }else{
-            root->right=deleteNode(root->right,key);
-        }
-    }
-    return root;
+    return root->left;
 }
 void inorder(Node* root){
     if(root==NULL) return;
@@ -72,16 +64,41 @@ void inorder(Node* root){
     cout<<root->data<<" ";
     inorder(root->right);
 }
-
+Node* deleteNode(Node* root,int key){
+    if(root==NULL) return NULL;
+    Node* temp=root;
+    if(temp->data==key) return helper(temp);
+    while(temp){
+        if(temp->data>key){
+            if(temp->left!=NULL&&temp->left->data==key){
+                temp->left=helper(temp->left);
+                break;
+            }else{
+                temp=temp->left;
+            }
+            
+        }else{
+            if(temp->right!=NULL&&temp->right->data==key){
+                temp->right=helper(temp->right);
+                break;
+            }else{
+                temp=temp->right;
+            }
+            
+        }
+    }
+    return root;
+}
 int main(){
     Node* root=NULL;
-    root=insert(root,1);
-    root=insert(root,2);
-    root=insert(root,9);
-    root=insert(root,5);
+    root=insert(1,root);
+    root=insert(2,root);
+    root=insert(3,root);
+    root=insert(4,root);
+    root=insert(5,root);
     inorder(root);
-    cout<<endl<<"element found "<<find(root,5);
-    root=deleteNode(root,1);
+    cout<<endl;
+    root=deleteNode(root,4);
     inorder(root);
     return 0;
 }
